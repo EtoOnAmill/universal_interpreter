@@ -1,0 +1,591 @@
+filtered RISC-V instructions
+
+ADDI       rd, rs1, imm
+NOP                                       # ADDI x0, x0, 0
+MVI        rd, rs1, imm                   # ADDI rd, rs1, 0
+SLTI       rd, rs1, imm                   # rd = (sr1<imm ? 1 : 0)
+SLTIU      rd, rs1, imm                   # rd = (sr1<imm ? 1 : 0)
+ANDI       rd, rs1, imm
+ORI        rd, rs1, imm
+XORI       rd, rs1, imm
+SLLI       rd, rs1, imm                   # logical left shift
+SRLI       rd, rs1, imm                   # logical right shift
+SRAI       rd, rs1, imm                   # arithmetic right shift, top bits become bottom bits
+AUIPC      rd, imm                        # add imm to program counter
+
+ADD        rd, rs1, rs2
+SUB        rd, rs1, rs2
+SLT        rd, rs1, rs2                   # rd = (rs1<rs2 ? 1 : 0)
+SLTU       rd, rs1, rs2                   # rd = (rs1<rs2 ? 1 : 0)
+
+AND        rd, rs1, rs2  
+OR         rd, rs1, rs2  
+XOR        rd, rs1, rs2  
+
+SLL        rd, rs1, rs2                   # logical shift left
+SRL        rd, rs1, rs2                   # logical shift right
+SRA        rd, rs1, rs2                   # arithmetic shift right
+
+JAL        rd, imm                        # rd=pc then pc=pc+imm
+JALR       rd, rs1, imm                   # rd=pc then pc=rs1+imm
+BEQ        rs1, rs2, imm                  # branch if equal
+BNE        rs1, rs2, imm                  # branch if not equal
+BLT        rs1, rs2, imm                  # branch if rs1<rs2
+BLTU       rs1, rs2, imm                  # branch if rs1<rs2
+BGE        rs1, rs2, imm                  # branch if rs1>=rs2
+BGEU       rs1, rs2, imm                  # branch if rs1>=rs2
+
+LOAD       rd, rs1, imm                   # rd=*(rs1+imm)
+STORE      rs1, rs2, imm                  # *(rs1+imm)=rs2
+LW                                        # load 32 bits
+LH                                        # load 16 bits, sign extend
+LHU                                       # load 16 bits, zero extend
+LB                                        # load 8 bits, sign extend
+LBU                                       # load 8 bits, zero extend
+SW                                        # store 32 bits
+SH                                        # store low 16 bits
+SB                                        # store low 8 bits
+
+LD         rd, rs1, imm                   # load a duble word (64 bits)
+SD         rs1, rs2, imm                  # store a duble word
+
+# 4096 control/status registers and dealing with them
+CSRRW      rd, rs1, csr                   # read/write: atomically rd=csr then csr=rs1, if rd==x0 then no effect on reading csr
+CSRRS      rd, rs1, csr                   # read/set: rd=csr then csr=rs1|csr, if rd==x0 then no effect on reading csr
+CSRRC      rd, rs1, csr                   # read/clear: rd=csr then csr=(!rs1)&csr, if rd==x0 then no effect on reading csr
+
+# counters
+# ZINCTR has CYCLE TIME and INSTRET
+RDCYCLE                                   # CSRRS rd, cycle, x0; reads clock cycle passed
+RDTIME                                    # CSRRS rd, time, x0; reads real time clock ticks that passed 
+RDINSTRET                                 # CSRRS rd, instret, x0; reads how many instructions have been read 
+# ZIHPM 29 hardware perfomance counters
+
+PAUSE                                     # FENCE x0, x0, fm=0, succ=0, pred=W
+
+ZIMOP                                     # 32 may be operations, unless redefined write 0 to rd
+MOP.R.n    rd, rs1                        # 0<=n<=31
+MOP.RR.n   rd, rs1, rs2                   # 0<=n<=7
+
+CZERO.eqz  rd, rs1, rs2                   # rd=(rs2==0 ? 0 : rs1)
+CZERO.nez  rd, rs1, rs2                   # rd=(rs2!=0 ? 0 : rs1)
+
+MUL        rd, rs1, rs2
+MULU       rd, rs1, rs2
+DIV        rd, rs1, rs2
+DIVU       rd, rs1, rs2
+REM        rd, rs1, rs2
+REMU       rd, rs1, rs2
+
+# frm can be any of these
+RNE                                       # round to nearest
+RTZ                                       # round towards zero
+RDN                                       # round towards -infinity
+RUP                                       # round towards +infinity
+RMM                                       # round to nearest with max magnitude
+
+FLW        rd, rs1, imm                   # load float
+FSW        rs1, rs2, imm                  # store float
+
+FADD.S     rd, rs1, rs2, frm
+FSUB.S     rd, rs1, rs2, frm
+FMUL.S     rd, rs1, rs2, frm
+FDIV.S     rd, rs1, rs2, frm
+FSQRT.S    rd, rs1, rs2, frm
+FMIN.S     rd, rs1, rs2
+FMAX.S     rd, rs1, rs2
+
+FMADD.S    rd, rs1, rs2, rs3, frm              # rd=(rs1*rs2 + rs3)
+FMSUB.S    rd, rs1, rs2, rs3, frm              # rd=(rs1*rs2 - rs3)
+FNMADD.S   rd, rs1, rs2, rs3, frm              # rd=-(rs1*rs2 - rs3)
+FNMSUB.S   rd, rs1, rs2, rs3, frm              # rd=-(rs1*rs2 + rs3)
+
+FCVT.W.S   rd, rs1, frm                        # convert floating to i32
+FCVT.L.S   rd, rs1, frm                        # convert float to i64
+FCVT.S.W   rd, rs1, frm                        # convert i32 to float
+FCVT.S.L   rd, rs1, frm                        # convert i64 to float
+
+FCVT.WU.S  rd, rs1, frm                        # convert floating to u32
+FCVT.LU.S  rd, rs1, frm                        # convert float to u64
+FCVT.S.WU  rd, rs1, frm                        # convert u32 to float
+FCVT.S.LU  rd, rs1, frm                        # convert u64 to float
+
+FSGNJ.S    rd, rs1, rs2                   # rd=rs1 without the sign bit
+FSGNJN.S   rd, rs1, rs2                   # rd=rs1 with the opposite sign bit of rs2
+FSGNJX.S   rd, rs1, rs2                   # rd=rs1 with the sign bit eq to sb(rs1) xor sb(rs2)
+
+FMV.X.W    rd, rs1                        # move float bits to int register
+FMV.W.X    rd, rs1                        # move int bits to float register
+
+FCMP.S       rd, rs1, rs2                   # -1 if lt, 0 if eq, 1 if gt
+
+FCLASS.S   rd, rs1                        # identifies the type of floating point
+# rd=0, rs1 = -inf
+# rd=1, rs1 < 0
+# rd=2, rs1 < 0 and is subnormal
+# rd=3, rs1 = -0
+# rd=4, rs1 = +0
+# rd=5, rs1 > 0 and is subnormal
+# rd=6, rs1 > 0
+# rd=7, rs1 = +inf
+# rd=8, rs1 = signaling NaN
+# rd=9, rs1 = quiet NaN
+
+FLD        rd, rs1, imm                   # load double
+FSD        rs1, rs2, imm                  # store double
+
+FADD.D     rd, rs1, rs2, frm
+FSUB.D     rd, rs1, rs2, frm
+FMUL.D     rd, rs1, rs2, frm
+FDIV.D     rd, rs1, rs2, frm
+FSQRT.D    rd, rs1, rs2, frm
+FMIN.D     rd, rs1, rs2, frm
+FMAX.D     rd, rs1, rs2, frm
+
+FMADD.D    rd, rs1, rs2, rs3, frm              # rd=(rs1*rs2 + rs3)
+FMSUB.D    rd, rs1, rs2, rs3, frm              # rd=(rs1*rs2 - rs3)
+FNMADD.D   rd, rs1, rs2, rs3, frm              # rd=-(rs1*rs2 - rs3)
+FNMSUB.D   rd, rs1, rs2, rs3, frm              # rd=-(rs1*rs2 + rs3)
+
+FCVT.W.D   rd, rs1                        # convert double to i32
+FCVT.L.D   rd, rs1                        # convert double to i64
+FCVT.D.W   rd, rs1                        # convert i32 to double
+FCVT.D.L   rd, rs1                        # convert i64 to double
+
+FCVT.WU.D  rd, rs1                        # convert double to u32
+FCVT.LU.D  rd, rs1                        # convert double to u64
+FCVT.D.WU  rd, rs1                        # convert u32 to double
+FCVT.D.LU  rd, rs1                        # convert u64 to double
+FCVT.S.D   rd, rs1                        # convert f64 to f32
+FCVT.D.S   rd, rs1                        # convert f32 to f64
+
+FSGNJ.D    rd, rs1, rs2                   # rd=rs1 without the sign bit
+FSGNJN.D   rd, rs1, rs2                   # rd=rs1 with the opposite sign bit of rs2
+FSGNJX.D   rd, rs1, rs2                   # rd=rs1 with the sign bit eq to sb(rs1) xor sb(rs2)
+
+FMV.X.W    rd, rs1                        # move double bits to int register
+FMV.W.X    rd, rs1                        # move int bits to double register
+FMV.X.D    rd, rs1                        # move double bits to int register
+FMV.D.X    rd, rs1                        # move int bits to double register
+
+FCMP.D rd, rs1, rs2                   # -1 if lt, 0 if eq, 1 if gt
+
+FCLASS.D   rd, rs1                        # identifies the type of double point
+
+ZFA                                       # additional floating point instructions
+FLI.S      rd, imm                        # loads one of 32 floating constants
+FLI.D      rd, imm                        # loads one of 32 floating constants
+# 00 -> -1.0
+# 01 -> minimmum positive normal 
+# 02 -> 2^(-16)
+# 03 -> 2^(-15)
+# 04 -> 2^(-8)
+# 05 -> 2^(-7)
+# 06 -> 0.0625
+# 07 -> 0.125
+# 08 -> 0.25
+# 09 -> 0.3125
+# 0a -> 0.375
+# 0b -> 0.4375
+# 0c -> 0.5
+# 0d -> 0.625
+# 0e -> 0.75
+# 0f -> 0.875
+# 10 -> 1.0
+# 11 -> 1.25
+# 12 -> 1.5
+# 13 -> 1.75
+# 14 -> 2.0
+# 15 -> 2.5
+# 16 -> 3
+# 17 -> 4
+# 18 -> 8
+# 19 -> 16
+# 1a -> 128
+# 1b -> 256
+# 1c -> 2^15
+# 1d -> 2^16
+# 1e -> +inf
+# 1f -> canonical NaN
+
+
+FMINM.fmt  rd, rs1, rs2                   # like FMIN but returns canonical NaN if rs1 or rs2 are NaN
+FMAXM.fmt  rd, rs1, rs2                   # like FMAX but returns canonical NaN if rs1 or rs2 are NaN
+
+FROUND.fmt rd, rs1, rm                    # round float in rs1 to int with rounding mode decided my rm
+
+BCLR       rd, rs1, rs2                   # clear bit rs1[rs2]
+BEXT       rd, rs1, rs2                   # bit rs1[rs2]
+BINV       rd, rs1, rs2                   # invert bit rs1[rs2]
+BSET       rd, rs1, rs2                   # set bit at rs2
+CLZ        rd, rs1                        # count leading zero
+CPOP       rd, rs1                        # count set bits
+CTZ        rd, rs1                        # count trailing zero
+MAX        rd, rs1, rs2                   # max of signed int
+MAXU       rd, rs1, rs2                   # max of unsigned int
+MIN        rd, rs1, rs2                   # min of signed int
+MINU       rd, rs1, rs2                   # min of unsigned int
+ORC.b      rd, rs1                        # if any byte has a bit set the equivalent byte in rd equals 0xff, else equals 0x00
+PACK       rd, rs1, rs2                   # rd = high(rs2) | low(rs1)
+REV8       rd, rs1                        # reverse bytes
+REV.b      rd, rs1                        # reverse bits in bytes
+ROR        rd, rs1, rs2                   # rotates right rs1's bits by rs2 amount
+SEXT       rd, rs1                        # sign extend
+UNZIP      rd, rs1                        # inverse the zip instruction
+XNOR       rd, rs1, rs2
+ZEXT       rd, rs1                        # zero extend
+ZIP        rd, rs1                        # even bits to high rd and odd bits to lower rd
+
+# seed CSR
+# memory region for randomness
+
+# priviliged instructions
+# CSR list
+# fflags : floating point accrued exceptiosn
+# frm : floating point dynamic roundinng mode
+# fcsr : floating point control and status
+# cycle
+# time
+# instret
+# hpmcounter 3-31 : performance monitoring counters
+# sstatus : supervisor status
+# sie : supervisor interrupt enable
+# stvec : supervisor trap handler base address
+# scounteren : supervisor counter enable
+# senvcfg : supervisor enviromen configuration
+# scountinhibit : supervisor counter inhibit
+# sscratch : scratch reg for supervisor trap handler
+# sepc : supervisor exception program counter
+# scause : supervisor trap cause
+# stval : supervisor bad address or instruction
+# sip : supervisor interrupt pending
+# scountovf : supervisor count overflow
+# satp : supervisor adress translation and protection
+# scontext : supervisor context
+# sstateen 0-3 : supervisor state enable 0-3
+# hstatus : hypervisor status
+# hedeleg : hypervisor exception delegation
+# hidele : hypervisor interrupt delegation
+# hie : hypervisor interrupt enable
+# hcounteren :  hypervisor counter enable
+# hgeie : hypervisor guest external interrupt enable
+# htval : hypervisor bad guest physical address
+# hip : hypervisor interrupt pending
+# hvip : hypervisor virtual interrupt pending
+# htinst : hypervisor trap instruction
+# hgeip : hypervisor guest external interrupt pending
+# henvcfg : hypervisor enviromen configuration
+# hgatp : hypervisor guest adress translation and protection
+# hcontext : hypervisor context
+# htimedelta : delta for VS/VU-mode timer
+# hstateen 0-3 : hypervisor state enable 0-3
+# vsstatus : virtual_supervisor status
+# vsie : virtual_supervisor interrupt enable
+# vstvec : virtual_supervisor trap handler base address
+# vsscratch : virtual_supervisor scratch
+# vsepc : virtual_supervisor exception program counter
+# vscause : virtual_supervisor trap cause
+# stval : virtual_supervisor bad address or instruction
+# vsip  : virtual_supervisor interrupt pending
+# vstap : virtual_supervisor address translation and protection
+# mvendorid : vendor id
+# marchid : architecture id
+# mimpid : implementation id
+# mhartid : hardware id
+# mconfigptr : pointer to configuration data structure
+# mstatus : machine status register
+# misa : isa and extensions
+# medeleg : machine exception delegation
+# mideleg : machine interrupt delegation
+# mie : machine interrupt enable
+# mtvec : machine trap-handler base address
+# mcoutneren : machine counter enable
+# mscratch : machine scratch register for trap handlers
+# mepc : machine exception program counter
+# mcause : machine trap cause
+# mtval : machine bad address or instruction
+# mip : machiine interrupt pending
+# mtinst : machine trap instruction
+# mtval3 : machine bad guest physical address
+# menvcfg : machine enviroment configuration register
+# mseccfg : machine security confguration register
+# pmpmcfg 0-15 : physical mmemory protection configuration
+# pmpaddr 0-63 : physical memory protection address
+# mstateen 0-3 : machine state enable 0-3
+# mnscratch : resumable NMI scratch
+# mnepc : resumable NMI program counter
+# mncause : resumable NMI cause
+# mnstatus : resumable NMI status
+# mcyclce : machine cycle counter
+# ministret : machine instruction retired counter
+# mhpmcounter 3-31 : machine performance monitoring counters
+# mcountinhibit : machine counter inhibit
+# mhpmevent 3-31 : machine performance monitoring event selector
+# tselect : debug/trace trigger register
+# tdata 1-3 : debug/trace data
+# mcontext : machine mode context
+# dcsr : debug control and status
+# dpc : debug program counter
+# dscratch0 : debug scratch register 0
+# dscratch1 : debug scratch register 1
+
+ECALL rd, rs1 # creates an call from mode exception 
+# both set the priviliged mode epc register to their address
+RET rd, rs1
+WFI rd, rs1 # wait for interrupt, idles the heart and take control when interrupt is detected
+
+0x01
+0x02
+0x03
+0x04
+0x05
+0x06
+0x07
+0x08
+0x09
+0x0a
+0x0b
+0x0c
+0x0d
+0x0e
+0x0f
+0x10
+0x11
+0x12
+0x13
+0x14
+0x15
+0x16
+0x17
+0x18
+0x19
+0x1a
+0x1b
+0x1c
+0x1d
+0x1e
+0x1f
+0x20
+0x21
+0x22
+0x23
+0x24
+0x25
+0x26
+0x27
+0x28
+0x29
+0x2a
+0x2b
+0x2c
+0x2d
+0x2e
+0x2f
+0x30
+0x31
+0x32
+0x33
+0x34
+0x35
+0x36
+0x37
+0x38
+0x39
+0x3a
+0x3b
+0x3c
+0x3d
+0x3e
+0x3f
+0x40
+0x41
+0x42
+0x43
+0x44
+0x45
+0x46
+0x47
+0x48
+0x49
+0x4a
+0x4b
+0x4c
+0x4d
+0x4e
+0x4f
+0x50
+0x51
+0x52
+0x53
+0x54
+0x55
+0x56
+0x57
+0x58
+0x59
+0x5a
+0x5b
+0x5c
+0x5d
+0x5e
+0x5f
+0x60
+0x61
+0x62
+0x63
+0x64
+0x65
+0x66
+0x67
+0x68
+0x69
+0x6a
+0x6b
+0x6c
+0x6d
+0x6e
+0x6f
+0x70
+0x71
+0x72
+0x73
+0x74
+0x75
+0x76
+0x77
+0x78
+0x79
+0x7a
+0x7b
+0x7c
+0x7d
+0x7e
+0x7f
+0x80
+0x81
+0x82
+0x83
+0x84
+0x85
+0x86
+0x87
+0x88
+0x89
+0x8a
+0x8b
+0x8c
+0x8d
+0x8e
+0x8f
+0x90
+0x91
+0x92
+0x93
+0x94
+0x95
+0x96
+0x97
+0x98
+0x99
+0x9a
+0x9b
+0x9c
+0x9d
+0x9e
+0x9f
+0xa0
+0xa1
+0xa2
+0xa3
+0xa4
+0xa5
+0xa6
+0xa7
+0xa8
+0xa9
+0xaa
+0xab
+0xac
+0xad
+0xae
+0xaf
+0xb0
+0xb1
+0xb2
+0xb3
+0xb4
+0xb5
+0xb6
+0xb7
+0xb8
+0xb9
+0xba
+0xbb
+0xbc
+0xbd
+0xbe
+0xbf
+0xc0
+0xc1
+0xc2
+0xc3
+0xc4
+0xc5
+0xc6
+0xc7
+0xc8
+0xc9
+0xca
+0xcb
+0xcc
+0xcd
+0xce
+0xcf
+0xd0
+0xd1
+0xd2
+0xd3
+0xd4
+0xd5
+0xd6
+0xd7
+0xd8
+0xd9
+0xda
+0xdb
+0xdc
+0xdd
+0xde
+0xdf
+0xe0
+0xe1
+0xe2
+0xe3
+0xe4
+0xe5
+0xe6
+0xe7
+0xe8
+0xe9
+0xea
+0xeb
+0xec
+0xed
+0xee
+0xef
+0xf0
+0xf1
+0xf2
+0xf3
+0xf4
+0xf5
+0xf6
+0xf7
+0xf8
+0xf9
+0xfa
+0xfb
+0xfc
+0xfd
+0xfe
+0xff
