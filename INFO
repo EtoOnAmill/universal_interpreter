@@ -4,66 +4,68 @@ The requirements for a valid programs that i wish to follow are:
 - no parsing error
 - no runtime exceptions
 
-Since the unit of the language is a byte, here are all 255 possible bytes
+The VM is a register machine that operates through contexts(ex: execution, comment, declaration) 
+There are 16 registers
+Since the unit of the language is a byte, here are all typeable ascii instructions (execution context)
 
-0x00    <nul>  Null
-0x01    <soh>  Start of Heading
-0x02    <stx>  Start of Text
-0x03    <etx>  End of Text
-0x04    <eot>  End of Transmission
-0x05    <enq>  Enquiry
-0x06    <ack>  Acknowledge
-0x07    <bel>  Bell
-0x08    <bs>  Backspace
-0x09    <ht>  Horizontal Tab
-0x0A    <lf>  NL Line Feed, New Line
-0x0B    <vt>  Vertical Tab
-0x0C    <ff>  NP Form Feed, New Page
-0x0D    <cr>  Carriage Return
-0x0E    <so>  Shift Out
-0x0F    <si>  Shift In
-0x10    <dle>  Data Link Escape
-0x11    <dc1>  Device Control 1
-0x12    <dc2>  Device Control 2
-0x13    <dc3>  Device Control 3
-0x14    <dc4>  Device Control 4
-0x15    <nak>  Negative Acknowledge
-0x16    <syn>  Synchronous Idle
-0x17    <etb>  End of Transmission Block
-0x18    <can>  Cancel
-0x19    <em>  End of Medium
-0x1A    <sub>  Substitute
-0x1B    <esc>  Escape
-0x1C    <fs>  File Separator
-0x1D    <gs>  Group Separator
-0x1E    <rs>  Record Separator
-0x1F    <us>  Unit Separator
+0x00    <nul>    End of program
+0x01    <^A>     Start of Heading
+0x02    <^B>     Fork
+0x03    <^C>     Terminate program
+0x04    <^D>     Terminate VM
+0x05    <^E>     Enquiry
+0x06    <^F>     Acknowledge
+0x07    <^G>     Bell
+0x08    <^H>     Backspace
+0x09    <^I>     Horizontal Tab
+0x0A    <^J>     Newline
+0x0B    <^K>     Vertical Tab
+0x0C    <^L>     NP Form Feed, New Page
+0x0D    <^M>     Carriage Return
+0x0E    <^N>     Shift Out
+0x0F    <^O>     Shift In
+0x10    <^P>     Data Link Escape
+0x11    <^Q>     Read from Standard Input
+0x12    <^R>     Write to Standard Output
+0x13    <^S>     Write to Standard Err
+0x14    <^T>     Write to given file descriptor
+0x15    <^U>     Negative Acknowledge
+0x16    <^V>     Yeld execution
+0x17    <^W>     Return
+0x18    <^X>     Zero the register
+0x19    <^Y>     Continue execution at start of program
+0x1A    <^Z>     Substitute
+0x1B    <^[>     NOOP
+0x1C    <^\>     File Separator
+0x1D    <^]>     Group Separator
+0x1E    <^^>     Record Separator
+0x1F    <^_>     Unit Separator
 0x20    <space>  Space
 0x21    <!>
-0x22    <">
-0x23    <#>
+0x22    <">"
+0x23    <#>      Begin comment context: all bytes are noop
 0x24    <$>
-0x25    <%> [2] modulus
+0x25    <%>      [2] modulus
 0x26    <&>
 0x27    <'>
 0x28    <(>
 0x29    <)>
-0x2A    <*> [2] multiplication
-0x2B    <+> [2] addition
+0x2A    <*>      [2] multiplication
+0x2B    <+>      [2] addition
 0x2C    <,>
-0x2D    <-> [2] subtraction
+0x2D    <->      [2] subtraction
 0x2E    <.>
-0x2F    </> [2] division
-0x30    <0> [0] the number 0; [1] church numeral
-0x31    <1> [0] the number 1; [1] church numeral
-0x32    <2> [0] the number 2; [1] church numeral
-0x33    <3> [0] the number 3; [1] church numeral
-0x34    <4> [0] the number 4; [1] church numeral
-0x35    <5> [0] the number 5; [1] church numeral
-0x36    <6> [0] the number 6; [1] church numeral
-0x37    <7> [0] the number 7; [1] church numeral
-0x38    <8> [0] the number 8; [1] church numeral
-0x39    <9> [0] the number 9; [1] church numeral
+0x2F    </>      [2] division
+0x30    <0>
+0x31    <1>
+0x32    <2>
+0x33    <3>
+0x34    <4>
+0x35    <5>
+0x36    <6>
+0x37    <7>
+0x38    <8>
+0x39    <9>
 0x3A    <:>
 0x3B    <;>
 0x3C    <<>
@@ -71,31 +73,31 @@ Since the unit of the language is a byte, here are all 255 possible bytes
 0x3E    <>>
 0x3F    <?>
 0x40    <@>
-0x41    <A>
-0x42    <B>
-0x43    <C>
-0x44    <D>
-0x45    <E>
-0x46    <F>
-0x47    <G>
-0x48    <H>
-0x49    <I>
-0x4A    <J>
-0x4B    <K>
-0x4C    <L>
-0x4D    <M>
-0x4E    <N>
-0x4F    <O>
-0x50    <P>
-0x51    <Q>
-0x52    <R>
-0x53    <S>
-0x54    <T>
-0x55    <U>
-0x56    <V>
-0x57    <W>
+0x41    <A>      [a,b] a b; apply
+0x42    <B>      [a,b,c] a (b c); bluebird
+0x43    <C>      [a,b,c] a c b; cardinal
+0x44    <D>      [a,b,c,d] a b (c d); dove
+0x45    <E>      [a,b,c,d,e] a b (c d e); eagle
+0x46    <F>      [a,b,c] c b a; finch
+0x47    <G>      [a,b,c,d] a d (b c); goldfinch
+0x48    <H>      [a,b,c] a b c b; hummingbird
+0x49    <I>      [a] a; identity function
+0x4A    <J>      [a,b,c,d] a b (a d c); jay
+0x4B    <K>      [a,b] a; kestrel
+0x4C    <L>      [a,b] a (b b); lark
+0x4D    <M>      [a] a a; mockingbird
+0x4E    <N>      [a,b] b (a b); owl
+0x4F    <O>      [a] (a a)(a a); omega
+0x50    <P>      [a,b,c,d] a (b d) (c d); phoenix
+0x51    <Q>      [a,b,c] b (a c); queer
+0x52    <R>      [a,b,c] b c a; robin
+0x53    <S>      [a,b,c] (a c)(b c); starling
+0x54    <T>      [a,b] b a; thrush
+0x55    <U>      [a,b] b (a a b); turing
+0x56    <V>      [a,b,c] c a b; vireo
+0x57    <W>      [a,b] a b b; warbler
 0x58    <X>
-0x59    <Y>
+0x59    <Y>      [a] a (Y a); Y combinator 
 0x5A    <Z>
 0x5B    <[>
 0x5C    <\>
@@ -103,34 +105,45 @@ Since the unit of the language is a byte, here are all 255 possible bytes
 0x5E    <^>
 0x5F    <_>
 0x60    <`>
-0x61    <a> [0] the number 10; [1] church numeral
-0x62    <b> [0] the number 11; [1] church numeral
-0x63    <c> [0] the number 12; [1] church numeral
-0x64    <d> [0] the number 13; [1] church numeral
-0x65    <e> [0] the number 14; [1] church numeral
-0x66    <f> [0] the number 15; [1] church numeral
-0x67    <g> [a,b,c,d] a d (b c); goldfinch
-0x68    <h> [a,b,c] a b c b; hummingbird
-0x69    <i> [x] x; identity function
-0x6A    <j> [a,b,c,d] a b (a d c); jay
-0x6B    <k> [x,y] x; kestrel
-0x6C    <l> [a,b] a (b b); lark
-0x6D    <m> [a] a a; mockingbird
-0x6E    <n> [a,b] b (a b); owl
-0x6F    <o> [a] (a a)(a a); omega
-0x70    <p> [a,b,c,d] a (b d) (c d); phoenix
-0x71    <q> [a,b,c] b (a c); queer
-0x72    <r> [a,b,c] b c a; robin
-0x73    <s> [x,y,z] (x z)(y z); starling
-0x74    <t> [a,b] b a; thrush
-0x75    <u> [a,b] b (a a b); turing
-0x76    <v> [a,b,c] c a b; vireo
-0x77    <w> [a,b] a b b; warbler
+0x61    <a>
+0x62    <b>
+0x63    <c>
+0x64    <d>
+0x65    <e>
+0x66    <f>
+0x67    <g>
+0x68    <h>
+0x69    <i>
+0x6A    <j>
+0x6B    <k>
+0x6C    <l>
+0x6D    <m>
+0x6E    <n>
+0x6F    <o>
+0x70    <p>
+0x71    <q>
+0x72    <r>
+0x73    <s>
+0x74    <t>
+0x75    <u>
+0x76    <v>
+0x77    <w>
 0x78    <x>
-0x79    <y> [a] a (Y a); Y combinator 
+0x79    <y>
 0x7A    <z>
 0x7B    <{>
 0x7C    <|>
 0x7D    <}>
 0x7E    <~>
-0x7F    <del>  Delete
+0x7F    <del>
+
+internal representation of numbers is done through
+struct number {
+    struct { unsigned sign : 1; unsigned length : 31; } metadata;
+    int decimal;
+    union { unsigned long *dwords; unsigned long value; };
+// dwords is a little endian array of metadata.length dwords
+// metadata.sign == 1 ? number is negative : number is positive
+// if metadata.length == 0, value is used, otherwhise it's dwords
+// decimal factor with this formula into the value of the number: value*2^decimal
+}
