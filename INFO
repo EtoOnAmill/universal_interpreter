@@ -1,4 +1,4 @@
-This language is designed so that every possible byte sequence is a valid program.
+This interpreter is designed so that every possible byte sequence is a valid program.
 
 The requirements for a valid programs that i wish to follow are:
 - no parsing error
