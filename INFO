@@ -22,8 +22,8 @@ Since the unit of the language is a byte, here are all typeable ascii instructio
 0x0B    <^K>     Vertical Tab
 0x0C    <^L>     NP Form Feed, New Page
 0x0D    <^M>     Carriage Return
-0x0E    <^N>     Shift Out
-0x0F    <^O>     Shift In
+0x0E    <^N>     Pop from context
+0x0F    <^O>     Push to context
 0x10    <^P>     Data Link Escape
 0x11    <^Q>     Read from Standard Input
 0x12    <^R>     Write to Standard Output

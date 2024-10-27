@@ -1,0 +1,61 @@
+An instruction can have 2 types of operands, defined by the instruction itself
+The first type is a register, there are 16 in total and are referenced through nibbles.
+The second type are byte immediate, their length is decided by a nibble which represents how many bytes long the immediate is, and the bytes that represent it are immediately after the nibble.
+A immediate will always be the last operand of an instruction and there will not be instructions that take two immediate as operands.
+Given that immediate are part of the instruction this is a variable size instruction architecture.
+All instruction bit size will be divisible by 8.
+
+The host architecture can be either 32 or 64 bits; internally the host's pointer size will be referred to as a WORD.
+Registers are double the size of WORD and their size will be referred as DWORD.
+Equivalently half the size of WORD will be referred as HWORD.
+All of these types are signed if prepended with S_.
+
+The enviroment of a program other than the 16 registers has available a CONTEXT datastructure interactible through various instructions.
+It's main purpuse is holding argument, beginning, and return address during a function call.
+While instructions are created around this idea it is not the only way of utilizing it.
+
+typedef struct context {
+    WORD origin;
+    WORD start;
+    rdata data;
+    struct context *super;
+} context;
+
+A register can hold 3 types of data, shortened to rdata:
+enum rdata_kind {
+    NUMBER,
+    CLOSURE,
+    PAIR,
+};
+typedef struct {
+    rdata_kind type;
+    union {
+        number n;
+        pair p;
+        closure c;
+    };
+} rdata;
+
+typedef struct {
+    HWORD sign : 1;
+    HWORD length : sizeof(HWORD)-1;
+    S_HWORD scale;
+    union {
+       WORD *words;
+       WORD word;
+    };
+} number;
+
+If .length is 0 .word is used, otherwhise .words is an array of WORDS in little endian.
+With .sign 1 the number is negative and with .sign 0 the number is positive.
+The value of the number is obtained by the formula: .word * 2^(.scale)
+
+typedef struct {
+    CONTEXT *context;
+    WORD jmp;
+} closure;
+
+typedef struct {
+    rdata *st;
+    rdata *nd;
+} pair;
