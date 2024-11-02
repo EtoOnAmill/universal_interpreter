@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define String char*
+
 #if UINTPTR_MAX == UINT64_MAX
 
     #define Word uint64_t
