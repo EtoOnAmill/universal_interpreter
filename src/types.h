@@ -5,54 +5,61 @@
 
 #define String char*
 
+enum exit_value {
+    NO_ERROR,
+    NO_PROGRAM,
+    INVALID_PROGRAM_PATH,
+    HOW
+};
+
 #if UINTPTR_MAX == UINT64_MAX
 
-    #define Word uint64_t
-    #define S_Word int64_t
+    typedef uint64_t Word;
+    typedef int64_t S_Word;
     #define WordSize sizeof(Word)
 
-    #define DWord struct { Word high; Word low; }
-    #define S_DWord struct { S_Word high; Word low; }
+    typedef struct { Word high; Word low; } DWord;
+    typedef struct { S_Word high; Word low; } S_DWord;
     #define DWordSize sizeof(DWord)
 
-    #define HWord uint32_t
-    #define S_HWord int32_t
+    typedef uint32_t HWord;
+    typedef int32_t S_HWord;
     #define HWordSize sizeof(HWord)
 
 #elif UINTPTR_MAX == UINT32_MAX
 
-    #define DWord uint64_t
-    #define S_DWord int64_t
+    typedef uint64_t DWord;
+    typedef int64_t S_DWord;
     #define DWordSize sizeof(DWord)
 
-    #define Word uint32_t
-    #define S_Word int32_t
+    typedef uint32_t Word;
+    typedef int32_t S_Word;
     #define WordSize sizeof(Word)
 
-    #define HWord uint16_t
-    #define S_HWord int16_t
+    typedef uint16_t HWord;
+    typedef int16_t S_HWord;
     #define HWordSize sizeof(HWord)
 
 #elif UINTPTR_MAX == UINT16_MAX
 
-    #define DWord uint32_t
-    #define S_DWord int32_t
+    typedef uint32_t DWord;
+    typedef int32_t S_DWord;
     #define DWordSize sizeof(DWord)
 
-    #define Word uint16_t
-    #define S_Word int16_t
+    typedef uint16_t Word;
+    typedef int16_t S_Word;
     #define WordSize sizeof(Word)
 
-    #define HWord uint8_t
-    #define S_HWord int8_t
+    typedef uint8_t HWord;
+    typedef int8_t S_HWord;
     #define HWordSize sizeof(HWord)
 
 #else
     #error "Unsupported architecture, ptr size isn't 16/32/64 bits"
 #endif
 
-#define Byte uint8_t
-#define S_Byte int8_t
+typedef uint8_t Byte;
+typedef int8_t S_Byte;
 #define ByteSize sizeof(Byte)
 
 #endif // types_h_INCLUDED
