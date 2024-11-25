@@ -1,18 +1,43 @@
-#include <stdlib.h>
 #include "instructions.h"
 
+enum type_op op_type(Byte op) {
+    enum type_op ret;
+    switch (op) {
+        default: ret = IMMEDIATE;
+    }
+    return ret;
+}
+
+struct expanded_instruction expand(struct instruction* instruction) {
+    struct expanded_instruction ret = {
+        .op = instruction->op,
+        .dst = instruction->dst,
+        .mod = instruction->mod,
+    };
+
+    // initialize the params union
+    switch(op_type(ret.op)) {
+        case REG_IMM: 
+            ret.params.reg_imm.reg = instruction->params.reg_imm.reg;
+            ret.params.reg_imm.half_immediate = instruction->params.reg_imm.half_immediate;
+            break;
+        case IMMEDIATE: 
+            ret.params.immediate = instruction->params.immediate;
+            break;
+    }
+    return ret;
+}
 
 Byte_hl split(Byte b) {
     Byte_hl ret = {
         .high = (b >> 4) & 0xf,
         .low = b & 0xf
     };
-    //memcpy(&ret, &b, 1);
     return ret;
 }
 
-void op(Byte opp, Byte parameters[]){
-    switch(opp){
+void op(struct instruction instruction){
+    switch(instruction.op){
         case(0x01):
             break;
         case(0x02):
@@ -523,6 +548,6 @@ void op(Byte opp, Byte parameters[]){
             break;
         case(0xff):
             break;
-        default: exit(HOW);
+        default: return;
     }
 }
